@@ -4,10 +4,10 @@ using System.Threading;
 
 const int port = 9999;
 var cancellationTokenSource = new CancellationTokenSource();
-var answers = new Queue<byte[]>();
-answers.Enqueue(new byte[] { 0x2A });
+var replies = new Queue<byte[]>();
+replies.Enqueue(new byte[] { 0x2A });
 
-var task = new Task(() => TcpReplicator.Replicate(IPAddress.Loopback, port, cancellationTokenSource.Token, answers));
+var task = new Task(() => TcpReplicator.Replicate(IPAddress.Loopback, port, cancellationTokenSource.Token, replies));
 task.Start();
 
 new ManualResetEvent(false).WaitOne(500); // Give it a little time to start up.
