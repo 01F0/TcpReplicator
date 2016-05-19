@@ -11,30 +11,30 @@ public static class TcpReplicator
 
         tcpListener.Start();
 
-        var tcpClient = tcpListener.AcceptTcpClient();
+       
+		using (var tcpClient = tcpListener.AcceptTcpClient())
+		{
+			using (var stream = tcpClient.GetStream())
+			{
+				while (!cancellationToken.IsCancellationRequested)
+				{
+					if (!stream.DataAvailable)
+						continue;
 
-        using (var stream = tcpClient.GetStream())
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (!stream.DataAvailable)
-                    continue;
+					if (replies.Count == 0)
+						break;
 
-                if (replies.Count == 0)
-                {
-                    break;
-                }
+					ReadAllAvailableData(stream); // We'll just read everything that exists, but we don't care about the answer.
 
-                ReadAllAvailableData(stream); // We'll just read everything that exists, but we don't care about the answer.
+					var nextAnswer = replies.Dequeue();
+					stream.Write(nextAnswer, 0, nextAnswer.Length);
 
-                var nextAnswer = replies.Dequeue();
-                stream.Write(nextAnswer, 0, nextAnswer.Length);
-
-                new ManualResetEvent(false).WaitOne(10);
-            }
-
-            tcpClient.Close();
-        }
+					new ManualResetEvent(false).WaitOne(10);
+				}
+			}
+		}
+		
+		tcpListener.Stop();
     }
 
     public static void ReadAllAvailableData(NetworkStream stream)
