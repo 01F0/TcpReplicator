@@ -1,13 +1,25 @@
-#load "TcpReplicator.csx"
+#load "TcpReplicator.cs"
+#load "TcpReplicatorSettings.cs"
+#load "DelayStrategies.cs" 
+
 using System.Linq;
 using System.Threading;
 
 const int port = 9999;
 var cancellationTokenSource = new CancellationTokenSource();
+
 var replies = new Queue<byte[]>();
 replies.Enqueue(new byte[] { 0x2A });
 
-var task = new Task(() => TcpReplicator.Replicate(IPAddress.Loopback, port, cancellationTokenSource.Token, replies));
+var tcpReplicatorSettings = new TcpReplicatorSettings 
+{ 
+    HostAddress = IPAddress.Loopback, 
+    HostPort = port, 
+    ReplyQueue = replies,
+    DelayStrategy = new NoDelayStrategy()
+};
+
+var task = new Task(() => TcpReplicator.Replicate(tcpReplicatorSettings, cancellationTokenSource.Token));
 task.Start();
 
 new ManualResetEvent(false).WaitOne(500); // Give it a little time to start up.
