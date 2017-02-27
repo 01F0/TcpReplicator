@@ -23,7 +23,7 @@ public static class TcpReplicator
 
 					ReadAllAvailableData(stream); // We'll just read everything that exists, but we don't care about the answer.
                     
-                    tcpReplicatorSettings.DelayStrategy.Run();
+                    			tcpReplicatorSettings.DelayStrategy.Run();
 
 					var nextAnswer = tcpReplicatorSettings.ReplyQueue.Dequeue();
 					stream.Write(nextAnswer, 0, nextAnswer.Length);
