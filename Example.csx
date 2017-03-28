@@ -1,6 +1,6 @@
-#load "TcpReplicator.cs"
-#load "TcpReplicatorSettings.cs"
-#load "DelayStrategies.cs" 
+#load "TcpReplicator.csx"
+#load "TcpReplicatorSettings.csx"
+#load "DelayStrategies.csx" 
 
 using System.Linq;
 using System.Threading;
