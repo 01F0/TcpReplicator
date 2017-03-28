@@ -15,18 +15,18 @@ public static class TcpReplicator
 			{
 				while (!cancellationToken.IsCancellationRequested)
 				{
-					if (!stream.DataAvailable)
-						continue;
+					if (stream.DataAvailable)
+					{
+						if (tcpReplicatorSettings.ReplyQueue.Count == 0)
+							break;
 
-					if (tcpReplicatorSettings.ReplyQueue.Count == 0)
-						break;
-
-					ReadAllAvailableData(stream); // We'll just read everything that exists, but we don't care about the answer.
+						ReadAllAvailableData(stream); // We'll just read everything that exists, but we don't care about the answer.
                     
-                    			tcpReplicatorSettings.DelayStrategy.Run();
+                    				tcpReplicatorSettings.DelayStrategy.Run();
 
-					var nextAnswer = tcpReplicatorSettings.ReplyQueue.Dequeue();
-					stream.Write(nextAnswer, 0, nextAnswer.Length);
+						var nextAnswer = tcpReplicatorSettings.ReplyQueue.Dequeue();
+						stream.Write(nextAnswer, 0, nextAnswer.Length);
+					}
 
 					new ManualResetEvent(false).WaitOne(10);
 				}
